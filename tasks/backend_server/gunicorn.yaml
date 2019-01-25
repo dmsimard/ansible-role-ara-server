@@ -1,0 +1,29 @@
+- become: yes
+  become_user: "{{ ara_server_user }}"
+  block:
+    - name: Install gunicorn
+      pip:
+        name: gunicorn
+        state: present
+        virtualenv: "{{ ara_server_venv | bool | ternary(ara_server_venv_path, omit) }}"
+        virtualenv_command: /usr/bin/python3 -m venv
+
+- become: yes
+  block:
+    - name: Set up systemd unit file for gunicorn
+      template:
+        src: ara-server.service.j2
+        dest: /etc/systemd/system/ara-server.service
+        owner: root
+        group: root
+        mode: 0644
+      notify:
+        - restart ara-server
+
+    - name: Enable and start ara-server with gunicorn
+      service:
+        name: ara-server
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      register: ara_server_service_enabled

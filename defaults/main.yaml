@@ -1,0 +1,162 @@
+---
+####################################
+# ara-server installation settings
+####################################
+# User/group created for the purpose of the installation
+ara_server_user: ara
+ara_server_group: ara
+
+# Root directories in which data, configuration and logs will be stored
+ara_server_home_dir: /var/lib/ara
+ara_server_config_dir: /etc/ara
+ara_server_log_dir: /var/log/ara
+ara_server_www_dir: /var/www/ara
+
+# Whether or not ara-server should be installed in a virtual environment
+ara_server_venv: true
+
+# Location of the virtualenv
+ara_server_venv_path: "{{ ara_server_home_dir }}/server/venv"
+
+# Install from source, from PyPi (or eventually, distro packages)
+ara_server_install_method: source
+
+# Version of ara-server to install
+# This can be a git ref (tag, branch, commit) when installed from source or
+# it can be a version number released to PyPi
+# When using "latest" as the source version, HEAD will be used
+# When using "latest" as the pypi version, the latest release will be used
+ara_server_install_version: latest
+
+# The source can be a remote git repository or a local filesystem path
+ara_server_source: "https://git.openstack.org/openstack/ara-server"
+
+# Location where ara-server will be checked out
+ara_server_source_checkout: "{{ ara_server_home_dir }}/git/ara-server"
+
+# The backend application server
+ara_server_backend_server: gunicorn
+
+# Address and port on which the application server will bind
+ara_server_backend_bind: "127.0.0.1:8000"
+
+# The frontend server
+ara_server_frontend_server: nginx
+
+# The domain the frontend server will be listening on
+ara_server_frontend_domain: api.ara.example.org
+
+####################################
+# ara-server configuration settings
+####################################
+
+# ARA_BASE_DIR - Default directory for storing data and configuration
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-base-dir
+ara_server_base_dir: "{{ ara_server_home_dir }}/server"
+
+# ARA_SETTINGS - Path to an ara-server configuration file
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-settings
+ara_server_settings: "{{ ara_server_config_dir }}/settings.yaml"
+
+# ARA_ENV - Environment to load configuration for
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-env
+ara_server_env: default
+
+# ARA_LOG_LEVEL - Log level of the different components
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-log-level
+ara_server_log_level: INFO
+
+# ARA_LOGGING - Python logging configuration
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-logging
+ara_server_logging:
+  disable_existing_loggers: false
+  formatters:
+    normal:
+      format: '%(asctime)s %(levelname)s %(name)s: %(message)s'
+  handlers:
+    console:
+      class: logging.handlers.TimedRotatingFileHandler
+      formatter: normal
+      level: "{{ ara_server_log_level }}"
+      filename: "{{ ara_server_log_dir }}/server.log"
+      when: 'midnight'
+      interval: 1
+      backupCount: 30
+  loggers:
+    ara:
+      handlers:
+      - console
+      level: "{{ ara_server_log_level }}"
+      propagate: 0
+  root:
+    handlers:
+    - console
+    level: "{{ ara_server_log_level }}"
+  version: 1
+
+# ARA_CORS_ORIGIN_ALLOW_ALL - django-cors-headers’s CORS_ORIGIN_WHITELIST_ALLOW_ALL setting
+# TODO: Not documented
+ara_server_cors_origin_allow_all: false
+
+# ARA_CORS_ORIGIN_WHITELIST - django-cors-headers’s CORS_ORIGIN_WHITELIST setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-cors-origin-whitelist
+ara_server_cors_origin_whitelist:
+  - "127.0.0.1:8000"
+  - "localhost:3000"
+
+# ARA_SERVER_ALLOWED_HOSTS - Django’s ALLOWED_HOSTS setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-allowed-hosts
+ara_server_allowed_hosts:
+  - "127.0.0.1"
+  - "localhost"
+  - "::1"
+  - "api.ara.example.org"
+
+# ARA_DEBUG - Django's DEBUG setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-debug
+ara_server_debug: false
+
+# ARA_SECRET_KEY - Django's SECRET_KEY setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-secret-key
+# If none are provided, one will be randomly generated
+ara_server_secret_key: null
+
+# ARA_STATIC_ROOT - Django’s STATIC_ROOT setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-static-root
+ara_server_static_root: "{{ ara_server_www_dir }}/static"
+
+# ARA_STATIC_URL - Django's STATIC_URL setting
+# TODO: Not documented
+ara_server_static_url: "/static/"
+
+# ARA_MEDIA_ROOT - Django's MEDIA_ROOT setting
+# TODO: Not documented
+ara_server_media_root: "{{ ara_server_www_dir }}/media"
+
+# ARA_MEDIA_URL - Django's MEDIA_URL setting
+# TODO: Not documented
+ara_server_media_url: "/media/"
+
+# ARA_DATABASE_ENGINE - Django’s ENGINE database setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-database-engine
+ara_server_database_engine: django.db.backends.sqlite3
+
+# ARA_DATABASE_NAME - Django’s NAME database setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-database-name
+ara_server_database_name: "{{ ara_server_home_dir }}/server/ansible.sqlite"
+
+# ARA_DATABASE_USER - Django’s USER database setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-database-user
+ara_server_database_user: null
+
+# ARA_DATABASE_PASSWORD - Django’s PASSWORD database setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-database-password
+ara_server_database_password: null
+
+# ARA_DATABASE_HOST - Django’s HOST database setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-database-host
+ara_server_database_host: null
+
+# ARA_DATABASE_PORT - Django’s PORT database setting
+# https://ara-server.readthedocs.io/en/latest/configuring.html#ara-database-port
+ara_server_database_port: null

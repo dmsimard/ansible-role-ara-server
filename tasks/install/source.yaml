@@ -1,0 +1,23 @@
+- become: yes
+  become_user: "{{ ara_server_user }}"
+  block:
+    - name: Prepare git repository for ara-server
+      git:
+        repo: "{{ ara_server_source }}"
+        dest: "{{ ara_server_source_checkout }}"
+        version: "{{ (ara_server_install_version == 'latest') | ternary('HEAD', ara_server_install_version) }}"
+
+    - name: Install ara-server
+      pip:
+        name: "{{ ara_server_source_checkout }}"
+        state: present
+        virtualenv: "{{ ara_server_venv | bool | ternary(ara_server_venv_path, omit) }}"
+        virtualenv_command: /usr/bin/python3 -m venv
+
+    - name: Prefix the virtualenv bin directory to PATH
+      set_fact:
+        path_with_virtualenv: "{{ ara_server_venv_path }}/bin:{{ ansible_env.PATH }}"
+      when: ara_server_venv | bool
+
+- name: Include configuration for ara-server
+  include_tasks: config.yaml

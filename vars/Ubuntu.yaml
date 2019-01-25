@@ -1,0 +1,6 @@
+ara_server_required_packages:
+  - git
+
+ara_server_nginx_user: www-data
+ara_server_nginx_group: www-data
+ara_server_nginx_config_path: /etc/nginx/sites-available

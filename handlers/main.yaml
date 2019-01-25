@@ -1,0 +1,14 @@
+---
+- name: restart nginx
+  become: true
+  service:
+    name: nginx
+    state: restarted
+  when: ara_server_nginx_enabled is not changed
+
+- name: restart ara-server
+  become: true
+  service:
+    name: ara-server
+    state: restarted
+  when: ara_server_service_enabled is not changed

@@ -1,0 +1,15 @@
+---
+- name: Set up pre-requirements
+  include_tasks: pre-requirements.yaml
+
+- name: Include ara-server installation
+  include_tasks: "install/{{ ara_server_install_method }}.yaml"
+
+- name: Include database engine configuration
+  include_tasks: "database_engine/{{ ara_server_database_engine }}.yaml"
+
+- name: Include backend server installation
+  include_tasks: "backend_server/{{ ara_server_backend_server }}.yaml"
+
+- name: Include frontend server installation
+  include_tasks: "frontend_server/{{ ara_server_frontend_server }}.yaml"
