@@ -10,7 +10,7 @@ ara_server_group: ara
 ara_server_home_dir: /var/lib/ara
 ara_server_config_dir: /etc/ara
 ara_server_log_dir: /var/log/ara
-ara_server_www_dir: /var/www/ara
+ara_server_www_dir: /var/www/ara-server
 
 # Whether or not ara-server should be installed in a virtual environment
 ara_server_venv: true
