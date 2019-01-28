@@ -1,5 +1,5 @@
 - become: yes
-  become_user: "{{ ara_server_user }}"
+  become_user: "{{ ara_user }}"
   block:
     - name: Prepare git repository for ara-server
       git:
@@ -18,6 +18,3 @@
       set_fact:
         path_with_virtualenv: "{{ ara_server_venv_path }}/bin:{{ ansible_env.PATH }}"
       when: ara_server_venv | bool
-
-- name: Include configuration for ara-server
-  include_tasks: config.yaml

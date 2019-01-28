@@ -1,0 +1,56 @@
+- become: yes
+  block:
+    - name: Install nginx
+      package:
+        name: nginx
+        state: present
+
+    - name: Set selinux boolean to allow nginx to reverse proxy
+      seboolean:
+        name: httpd_can_network_connect
+        state: yes
+        persistent: yes
+      when: ansible_os_family == "RedHat"
+
+    - when: ara_server_install | bool
+      block:
+        - name: Set up nginx vhost for ara-server
+          template:
+            src: ara-server-vhost.conf.j2
+            dest: "{{ ara_nginx_config_path }}/ara-server.conf"
+          notify:
+            - restart nginx
+
+        - name: Enable the nginx configuration on Debian-like systems
+          file:
+            src: "{{ ara_nginx_config_path }}/ara-server.conf"
+            dest: /etc/nginx/sites-enabled/ara-server.conf
+            state: link
+          notify:
+            - restart nginx
+          when: ansible_os_family == "Debian"
+
+    - when: ara_web_install | bool
+      block:
+        - name: Set up nginx vhost for ara-web
+          template:
+            src: ara-web-vhost.conf.j2
+            dest: "{{ ara_nginx_config_path }}/ara-web.conf"
+          notify:
+            - restart nginx
+
+        - name: Enable the nginx configuration on Debian-like systems
+          file:
+            src: "{{ ara_nginx_config_path }}/ara-web.conf"
+            dest: /etc/nginx/sites-enabled/ara-web.conf
+            state: link
+          notify:
+            - restart nginx
+          when: ansible_os_family == "Debian"
+
+    - name: Enable and start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+      register: ara_nginx_enabled

@@ -1,0 +1,62 @@
+- become: yes
+  become_user: "{{ ara_user }}"
+  block:
+    - name: Prepare git repository for ara-web
+      git:
+        repo: "{{ ara_web_source }}"
+        dest: "{{ ara_web_source_checkout }}"
+        version: "{{ (ara_web_install_version == 'latest') | ternary('HEAD', ara_web_install_version) }}"
+        force: yes
+
+    # TODO: Figure out how to configure the webapp outside the git repo
+    - name: Configure API server for ara-web
+      vars:
+        web_config:
+          apiURL: "{{ ara_web_api_server }}"
+      copy:
+        content: "{{ web_config | to_nice_json(indent=2) }}"
+        dest: "{{ ara_web_source_checkout }}/public/config.json"
+      notify:
+        - restart ara-web
+
+    - name: Install ara-web dependencies
+      npm:
+        name: "{{ ara_web_source_checkout }}"
+        path: "{{ ara_web_base_dir }}"
+        global: "{{ ara_web_global_node_modules }}"
+        state: latest
+
+- when: ara_web_dev_server | bool
+  become: yes
+  block:
+    - name: Set up systemd unit file for ara-web
+      template:
+        src: ara-web.service.j2
+        dest: /etc/systemd/system/ara-web.service
+        owner: root
+        group: root
+        mode: 0644
+      notify:
+        - restart ara-web
+
+    - name: Enable and start ara-web
+      service:
+        name: ara-web
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      register: ara_web_service_enabled
+
+- when: not ara_web_dev_server | bool
+  become: yes
+  block:
+    - name: Stop and disable ara-web
+      service:
+        name: ara-web
+        state: stopped
+        enabled: no
+
+    - name: Ensure systemd unit file is not configured
+      file:
+        path: "/etc/systemd/system/ara-web.service"
+        state: absent

@@ -1,7 +1,7 @@
-ara_server_required_packages:
+ara_required_packages:
   - git
   - python3-venv
 
-ara_server_nginx_user: www-data
-ara_server_nginx_group: www-data
-ara_server_nginx_config_path: /etc/nginx/sites-available
+ara_nginx_user: www-data
+ara_nginx_group: www-data
+ara_nginx_config_path: /etc/nginx/sites-available

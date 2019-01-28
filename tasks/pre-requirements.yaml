@@ -1,7 +1,9 @@
-- name: Fail pre-emptively if running Python <3.6
+- name: Fail fast if running Python <3.6 for ara-server
   fail:
     msg: "Python >=3.6 is required to run ara-server"
-  when: ansible_python_version is version("3.6", "<")
+  when:
+    - ansible_python_version is version("3.6", "<")
+    - ara_server_install
 
 - name: Include OS family/distribution specific variables
   include_vars: "{{ item }}"
@@ -13,25 +15,24 @@
   block:
     - name: Install required packages
       package:
-        name: "{{ ara_server_required_packages }}"
+        name: "{{ ara_required_packages }}"
         state: present
 
-    - name: Create user for ara-server
+    - name: Create user for ara
       user:
-        name: "{{ ara_server_user }}"
+        name: "{{ ara_user }}"
         comment: User for ARA Records Ansible
         shell: /sbin/nologin
-        home: "{{ ara_server_home_dir }}"
+        home: "{{ ara_home_dir }}"
 
     - name: Ensure required directories are created with the right permissions
       file:
         path: "{{ item }}"
         state: directory
-        owner: "{{ ara_server_user }}"
-        group: "{{ ara_server_group }}"
+        owner: "{{ ara_user }}"
+        group: "{{ ara_group }}"
         mode: 0750
       loop:
-        - "{{ ara_server_home_dir }}"
-        - "{{ ara_server_base_dir }}"
-        - "{{ ara_server_config_dir }}"
-        - "{{ ara_server_log_dir }}"
+        - "{{ ara_home_dir }}"
+        - "{{ ara_config_dir }}"
+        - "{{ ara_log_dir }}"

@@ -78,9 +78,9 @@
           # Managed by ansible-role-ara-server
           {{ ara_server_configuration | to_nice_yaml(indent=2) }}
         dest: "{{ ara_server_settings }}"
-        owner: "{{ ara_server_user }}"
-        group: "{{ ara_server_group }}"
+        owner: "{{ ara_user }}"
+        group: "{{ ara_group }}"
         mode: 0750
       notify:
         - restart ara-server
-      no_log: yes
+      no_log: no

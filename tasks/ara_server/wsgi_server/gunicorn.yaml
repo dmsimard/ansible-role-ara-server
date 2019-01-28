@@ -1,5 +1,5 @@
 - become: yes
-  become_user: "{{ ara_server_user }}"
+  become_user: "{{ ara_user }}"
   block:
     - name: Install gunicorn
       pip:

@@ -1,0 +1,16 @@
+- become: yes
+  become_user: "{{ ara_user }}"
+  block:
+    - name: Ensure the database directory exists
+      file:
+        path: "{{ ara_server_database_name | basename }}"
+        state: directory
+        owner: "{{ ara_user }}"
+        group: "{{ ara_group }}"
+        mode: 0750
+
+    - name: Run SQL migrations
+      environment:
+        ARA_SETTINGS: "{{ ara_server_settings }}"
+        PATH: "{{ path_with_virtualenv | default(omit) }}"
+      command: ara-manage migrate

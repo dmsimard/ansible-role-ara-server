@@ -1,6 +1,6 @@
-ara_server_required_packages:
+ara_required_packages:
   - git
 
-ara_server_nginx_user: nginx
-ara_server_nginx_group: nginx
-ara_server_nginx_config_path: /etc/nginx/conf.d
+ara_nginx_user: nginx
+ara_nginx_group: nginx
+ara_nginx_config_path: /etc/nginx/conf.d

@@ -1,0 +1,15 @@
+- name: Create web base directory
+  become: yes
+  become_user: "{{ ara_user }}"
+  file:
+    path: "{{ ara_web_base_dir }}"
+    state: directory
+    owner: "{{ ara_user }}"
+    group: "{{ ara_group }}"
+    mode: 0750
+
+- name: Install nodejs
+  include_tasks: nodejs.yaml
+
+- name: Include ara-web installation
+  include_tasks: install/{{ ara_web_install_method }}.yaml

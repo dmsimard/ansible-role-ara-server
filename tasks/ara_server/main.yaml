@@ -1,0 +1,35 @@
+- name: Create server base directory
+  become: yes
+  become_user: "{{ ara_user }}"
+  file:
+    path: "{{ ara_server_base_dir }}"
+    state: directory
+    owner: "{{ ara_user }}"
+    group: "{{ ara_group }}"
+    mode: 0750
+
+- name: Include ara-server installation
+  include_tasks: install/{{ ara_server_install_method }}.yaml
+
+- name: Include ara-server configuration
+  include_tasks: config.yaml
+
+- name: Include ara-server database engine configuration
+  include_tasks: "database_engine/{{ ara_server_database_engine }}.yaml"
+
+- name: Create static asset directory
+  file:
+    path: "{{ ara_server_www_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Collect static files
+  environment:
+    ARA_SETTINGS: "{{ ara_server_settings }}"
+    PATH: "{{ path_with_virtualenv | default(omit) }}"
+  command: ara-manage collectstatic --clear --no-input
+
+- name: Include WSGI server installation for ara-server
+  include_tasks: "wsgi_server/{{ ara_server_wsgi_server }}.yaml"

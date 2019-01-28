@@ -4,11 +4,25 @@
   service:
     name: nginx
     state: restarted
-  when: ara_server_nginx_enabled is not changed
+  when:
+    - ara_webserver == "nginx"
+    - ara_nginx_enabled is defined
+    - ara_nginx_enabled is not changed
 
 - name: restart ara-server
   become: true
   service:
     name: ara-server
     state: restarted
-  when: ara_server_service_enabled is not changed
+  when:
+    - ara_server_install | bool
+    - ara_server_service_enabled is not changed
+
+- name: restart ara-web
+  become: true
+  service:
+    name: ara-web
+    state: restarted
+  when:
+    - ara_web_install | bool
+    - ara_web_service_enabled is not changed

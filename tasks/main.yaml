@@ -2,14 +2,13 @@
 - name: Set up pre-requirements
   include_tasks: pre-requirements.yaml
 
-- name: Include ara-server installation
-  include_tasks: "install/{{ ara_server_install_method }}.yaml"
+- name: Set up ara-server
+  include_tasks: ara_server/main.yaml
+  when: ara_server_install | bool
 
-- name: Include database engine configuration
-  include_tasks: "database_engine/{{ ara_server_database_engine }}.yaml"
+- name: Include ara-web installation
+  include_tasks: ara_web/main.yaml
+  when: ara_web_install | bool
 
-- name: Include backend server installation
-  include_tasks: "backend_server/{{ ara_server_backend_server }}.yaml"
-
-- name: Include frontend server installation
-  include_tasks: "frontend_server/{{ ara_server_frontend_server }}.yaml"
+- name: Include web server installation
+  include_tasks: "webserver/{{ ara_webserver }}.yaml"
